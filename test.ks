@@ -1,9 +1,19 @@
 run once libStat.
+run once libSched.
 
-statAdd("test", { return 23. }).
-statAdd("more testing", { return statFormatTime(time:seconds). }).
+parameter doit is false.
 
-until false {
-	statRefresh().
-	wait 1.
+if doit {
+  clearscreen.
+  print done.
+  wait 5.
 }
+else {
+  schedAdd("run test(true).", statTime(60)).
+  statAddSchedule().
+  until false {
+    statRefresh().
+    wait 0.2.
+  }
+}
+

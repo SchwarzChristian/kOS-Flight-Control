@@ -1,4 +1,6 @@
 run once libCalc.
+run once libSched.
+run once libCalc.
 
 parameter wCaption is 20, wValue is 20.
 
@@ -13,6 +15,13 @@ function statClean {
 function statAdd {
 	parameter caption, value.
 	
+  if caption:length > wCaption {
+    set caption to caption:substring(0, wCaption - 3) + "...".
+  }
+
+  if ("" + value):length > wValue {
+    set value to ("" + value):substring(0, wValue - 3) + "...".
+  }
 	fields:add(list(caption, value)).
 }
 
@@ -21,7 +30,7 @@ function statRefresh {
 	print hRule.
 	for field in fields {
 		local caption is field[0] + fill(wCaption - field[0]:length, " ").
-		local value is "" + field[1]().
+		local value is field[1]().
 		set value to value + fill(wValue - value:length, " ").
 		
 		print "| " + caption + " | " + value + " |".
@@ -84,12 +93,18 @@ function statAvgIsp {
 		set ens to ens + 1.
 	}
 
-	return isp / ens;
+	return isp / ens.
 }
 
 function statDVInStage {
 	local fuel is statFuel.
 	return fuel * statAvgIsp() / (ship:mass - fuel / 2).
+}
+
+function statAddSchedule {
+  for cmd in schedTable() {
+    statAdd(cmd[1], calcFormatTime(cmd[0])).
+  }
 }
 
 local function fill {
