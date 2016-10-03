@@ -6,8 +6,9 @@ parameter wCaption is 20, wValue is 20.
 
 local fields is list().
 local hRule is "+-" + fill(wCaption, "-") + "-+-" + fill(wValue, "-") + "-+".
+local redrawFrame is true.
 
-function statClean {
+function statClear {
 	set fields to list().
 	clearscreen.
 }
@@ -15,26 +16,37 @@ function statClean {
 function statAdd {
 	parameter caption, value.
 	
-  if caption:length > wCaption {
-    set caption to caption:substring(0, wCaption - 3) + "...".
-  }
-
-  if ("" + value):length > wValue {
-    set value to ("" + value):substring(0, wValue - 3) + "...".
-  }
 	fields:add(list(caption, value)).
+  set redrawFrame to true.
 }
 
 function statRefresh {
-	clearscreen.
-	print hRule.
+  if redrawFrame {
+    clearscreen.
+    print hRule.
+	  for field in fields {
+		  local caption is field[0].
+
+      if caption:length > wCaption {
+        set caption to caption:substring(0, wCaption - 3) + "...".
+      }
+
+		  print "| " + caption:padRight(wCaption) + " | " + "":padRight(wValue) + " |".
+		  print hRule.
+    }
+    set redrawFrame to false.
+  }
+  
+  local line is 1.
 	for field in fields {
-		local caption is field[0] + fill(wCaption - field[0]:length, " ").
-		local value is field[1]().
-		set value to value + fill(wValue - value:length, " ").
+		local value is "" + field[1]().
+
+    if ("" + value):length > wValue {
+      set value to ("" + value):substring(0, wValue - 3) + "...".
+    }
 		
-		print "| " + caption + " | " + value + " |".
-		print hRule.
+		print value:padRight(wValue) at (wCaption + 5, line).
+    set line to line + 2.
 	}
 }
 
@@ -50,7 +62,13 @@ function statTime {
 
 function statFormatTime {
 	parameter t.
-	
+  local ret is "".
+
+  if t < 0 {
+    set t to -t.
+    set ret to "-".
+  }
+  
 	local ret is calcMod(t, 60) + "s".
 	set t to floor(t / 60).
 	if t <= 0 { return ret. }
@@ -102,9 +120,16 @@ function statDVInStage {
 }
 
 function statAddSchedule {
-  for cmd in schedTable() {
-    statAdd(cmd[1], calcFormatTime(cmd[0])).
+  local schedule is schedTable().
+  for k in schedule:keys {
+    local cmd is schedule[k].
+    statAdd(k + ": " + cmd[1], { return statFormatTime(cmd[0] - time:seconds). }).
   }
+  set redrawFrame to true.
+}
+
+function schedLength {
+  return schedule:length.
 }
 
 local function fill {

@@ -1,8 +1,8 @@
 if body = Kerbin and altitude < 100 {
 	list processors in p.
 	p[0]:doEvent("open terminal").
-	switch to 0.
-	run load.
+  switch to 0.
+  run load.
 	run ascend.
 } else {
 	wait 3.
@@ -10,12 +10,19 @@ if body = Kerbin and altitude < 100 {
 	p[0]:doEvent("open terminal").
 }
 
-clearscreen.
+run once "libStat".
+run once "libSched".
 
-if exists("1:/todo") {
-	print "running todo...".
-	runpath("1:/todo").
-	deletepath("1:/todo").
-} else {
-	print "nothing to do".
+statAddSchedule().
+
+until schedLength() <= 0 {
+  statRefresh().
+  if schedDo() {
+    statAddSchedule().
+    sas on.
+  }
+  wait 0.1.
 }
+
+statClear().
+print "flight plan empty".
