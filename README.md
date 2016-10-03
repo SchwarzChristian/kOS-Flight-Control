@@ -1,4 +1,7 @@
 # kOS
+Work in Progress
+
+see [Wiki](https://github.com/SchwarzChristian/kOS-Flight-Control/wiki)
 
 # Links
 * [Kerbal Space Program](https://kerbalspaceprogram.com/en/)
