@@ -38,7 +38,7 @@ for filename in allFiles {
 
 for filename in copyFiles {
   print "copy " + filename.
-  copypath("0:" + filename + ".ks", "1:" + filename + ".ks").
+  copypath("0:src/" + filename + ".ks", "1:" + filename + ".ks").
 }
 
 switch to 1.
